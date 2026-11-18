@@ -75,6 +75,8 @@ section.block h3 small { font-family: var(--font-body); font-weight: 400; font-s
 .s2 { grid-column: span 2; } .s3 { grid-column: span 3; } .s4 { grid-column: span 4; }
 @media (max-width: 560px) { .s2, .s3, .s4 { grid-column: span 6; } }
 label.l, .l { font-size: 13px; font-weight: 700; color: var(--muted); }
+input[type=date], input[type=time] { -webkit-appearance: none; appearance: none; min-height: 44px; display: block; max-width: 100%; min-width: 0; text-align: left; }
+input::-webkit-date-and-time-value { text-align: left; }
 input[type=text], input[type=date], input[type=time], input[type=email], input[type=tel], textarea, select {
   width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 7px; padding: 9px 11px;
 }
@@ -1134,6 +1136,9 @@ const Registro = (() => {
       </div>`;
     $r('re-assin').innerHTML = (f.tipo === 'pra' ? sigBox('assinResp', 'Visto do responsável do local') : '') + sigBox('assinProf', 'Visto do(a) professor(a) supervisor(a)');
     $r('re-lock').hidden = !lock;
+    $r('re-lock').textContent = r._novo
+      ? 'Assinado. Depois da assinatura os dados ficam travados, para não serem alterados após o visto. Confira e toque em "Salvar registro". Se precisar corrigir algo, apague a assinatura, corrija e peça para assinar de novo.'
+      : 'Este registro já foi assinado, por isso os dados estão travados. Para corrigir, apague a(s) assinatura(s), faça a correção e peça para assinarem de novo.';
     $r('re-del').hidden = !!r._novo;
     $r('re-err').textContent = '';
   }
@@ -1948,7 +1953,7 @@ route();
     <div class="who"><span>Usando como <b id="who-name"></b></span>
       <button type="button" class="linklike" id="who-change">trocar</button>
       <button type="button" class="btn ghost" id="install-btn" hidden style="padding:6px 12px;font-size:13.5px">Instalar no celular</button></div>
-    <div class="ios-tip" id="ios-tip" hidden>Para instalar no iPhone: toque em <b>Compartilhar</b> no Safari e depois em <b>Adicionar à Tela de Início</b>.</div>`);
+    <div class="ios-tip" id="ios-tip" hidden>Para instalar no iPhone ou iPad: toque em <b>Compartilhar</b> no Safari e depois em <b>Adicionar à Tela de Início</b>.</div>`);
   const showWho = () => { $('who-name').textContent = LS.get('fichas_usuario', '') || '—'; };
   let deferredPrompt = null;
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; if (!standalone()) $('install-btn').hidden = false; });
