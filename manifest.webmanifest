@@ -1,6 +1,6 @@
 {
-  "name": "Pasta de Estágio",
-  "short_name": "Pasta Estágio",
+  "name": "Minha Pastinha",
+  "short_name": "Minha Pastinha",
   "description": "Fichas de atendimento, registro de estágio com assinatura e conversor de documentos.",
   "lang": "pt-BR",
   "start_url": "./",
