@@ -1883,6 +1883,11 @@ route();
 .dialog .consent ul { margin: 6px 0 0; padding-left: 18px; }
 .check { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; cursor: pointer; }
 .check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); flex: none; }
+.upd-bar { position: fixed; z-index: 70; left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); top: calc(10px + env(safe-area-inset-top, 0px));
+  max-width: 560px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 12px;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 10px 28px -12px rgba(3, 22, 58, .55); font-size: 14.5px; }
+.upd-bar span { flex: 1 1 180px; font-weight: 700; }
+.upd-bar .btn { padding: 8px 14px; }
 </style>
 
 <div class="overlay" id="onb" hidden>
@@ -1978,7 +1983,25 @@ route();
   if (!LS.get('fichas_usuario', '')) openOnb(true); else logUse();
   flush();
 
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  /* ---- updates: check on open and when the app comes back to the screen; ask before reloading ---- */
+  if ('serviceWorker' in navigator) {
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+      const check = () => { if (navigator.onLine) reg.update().catch(() => {}); };
+      check();
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+      setInterval(check, 30 * 60 * 1000);
+    }).catch(() => {});
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || $('upd-bar')) return;          // first install: nothing to announce
+      document.body.insertAdjacentHTML('beforeend', `<div class="upd-bar" id="upd-bar" role="status">
+        <span>Nova versão do app disponível.</span>
+        <button type="button" class="btn" id="upd-go">Atualizar</button>
+        <button type="button" class="linklike" id="upd-later">Depois</button></div>`);
+      $('upd-go').addEventListener('click', () => location.reload());
+      $('upd-later').addEventListener('click', () => $('upd-bar').remove());
+    });
+  }
 })();
 </script>
 
